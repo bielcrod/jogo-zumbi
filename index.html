@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jogo da Memória: Zumbis</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #ff5555;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .stats {
+      margin-bottom: 15px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .stats span {
+      color: #00ffae;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+
+    .card.flip {
+      transform: rotateY(180deg);
+    }
+
+    .card .front,
+    .card .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      backface-visibility: hidden;
+    }
+
+    .card .front {
+      background-color: #333;
+      color: #ff5555;
+    }
+
+    .card .back {
+      background-color: #1e1e1e;
+      transform: rotateY(180deg);
+    }
+
+    .message {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #00ffae;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #ff5555;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff7777;
+    }
+
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .card .front, .card .back {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🧟 Jogo da Memória: Zumbis</h1>
+
+  <div class="stats">
+    Jogadas: <span id="moves">0</span> |
+    Pares: <span id="matches">0</span> |
+    Tempo: <span id="timer">0</span> segundos
+  </div>
+
+  <div class="grid" id="gameBoard"></div>
+
+  <div class="message" id="message"></div>
+
+  <button onclick="restartGame()">🔄 Jogar Novamente</button>
+
+  <script>
+    const emojis = ['🧟', '🧠', '🔫', '🪓', '🩸', '☣️', '🏚️', '⚰️'];
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lock = false;
+    let moves = 0;
+    let matches = 0;
+    let time = 0;
+    let timerStarted = false;
+    let interval;
+
+    const board = document.getElementById('gameBoard');
+    const movesEl = document.getElementById('moves');
+    const matchesEl = document.getElementById('matches');
+    const messageEl = document.getElementById('message');
+    const timerEl = document.getElementById('timer');
+
+    function shuffle(array) {
+      return array.sort(() => 0.5 - Math.random());
+    }
+
+    function createCard(emoji, index) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.emoji = emoji;
+      card.dataset.index = index;
+
+      card.innerHTML = `
+        <div class="front">❓</div>
+        <div class="back">${emoji}</div>
+      `;
+
+      card.addEventListener('click', () => flipCard(card));
+      return card;
+    }
+
+    function flipCard(card) {
+      if (lock || card.classList.contains('matched') || card === firstCard) return;
+
+      if (!timerStarted) {
+        startTimer();
+        timerStarted = true;
+      }
+
+      card.classList.add('flip');
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        lock = true;
+        moves++;
+        movesEl.textContent = moves;
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      const match = firstCard.dataset.emoji === secondCard.dataset.emoji;
+
+      if (match) {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        matches++;
+        matchesEl.textContent = matches;
+
+        if (matches === emojis.length) {
+          clearInterval(interval);
+          messageEl.textContent = `🎉 Vitória! Você sobreviveu em ${time} segundos com ${moves} jogadas!`;
+        }
+
+        resetTurn();
+      } else {
+        setTimeout(() => {
+          firstCard.classList.remove('flip');
+          secondCard.classList.remove('flip');
+          resetTurn();
+        }, 1000);
+      }
+    }
+
+    function resetTurn() {
+      [firstCard, secondCard] = [null, null];
+      lock = false;
+    }
+
+    function startTimer() {
+      interval = setInterval(() => {
+        time++;
+        timerEl.textContent = time;
+      }, 1000);
+    }
+
+    function initGame() {
+      cards = shuffle([...emojis, ...emojis]);
+      board.innerHTML = '';
+      cards.forEach((emoji, index) => {
+        const card = createCard(emoji, index);
+        board.appendChild(card);
+      });
+
+      // Reset stats
+      moves = 0;
+      matches = 0;
+      time = 0;
+      timerStarted = false;
+      clearInterval(interval);
+      movesEl.textContent = moves;
+      matchesEl.textContent = matches;
+      timerEl.textContent = time;
+      messageEl.textContent = '';
+    }
+
+    function restartGame() {
+      initGame();
+    }
+
+    // Inicia ao carregar
+    initGame();
+  </script>
+</body>
+</html>
+
