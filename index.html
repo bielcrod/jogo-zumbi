@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -19,18 +20,34 @@
       flex-direction: column;
       align-items: center;
       padding: 30px 15px;
+      min-height: 100vh;
     }
 
     h1 {
       margin-bottom: 20px;
       color: #ff5555;
       text-shadow: 1px 1px 3px #000;
+      text-align: center;
+    }
+
+    .game-info {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 500px;
     }
 
     .stats {
-      margin-bottom: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 15px;
+      border-radius: 8px;
       font-size: 1rem;
       text-align: center;
+      flex: 1;
+      min-width: 150px;
     }
 
     .stats span {
@@ -38,14 +55,60 @@
       font-weight: bold;
     }
 
+    .difficulty {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .difficulty button {
+      padding: 8px 15px;
+      background-color: #333;
+      border: none;
+      color: white;
+      font-size: 0.9rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .difficulty button.active {
+      background-color: #ff5555;
+    }
+
+    .difficulty button:hover {
+      background-color: #555;
+    }
+
+    .difficulty button.active:hover {
+      background-color: #ff7777;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
       gap: 10px;
-      max-width: 400px;
-      width: 100%;
       perspective: 1000px;
       margin-bottom: 20px;
+    }
+
+    .grid.easy {
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .grid.medium {
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .grid.hard {
+      grid-template-columns: repeat(6, 1fr);
+      max-width: 600px;
+      width: 100%;
     }
 
     .card {
@@ -55,10 +118,16 @@
       transform-style: preserve-3d;
       transition: transform 0.6s;
       cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .card.flip {
       transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      animation: pulse 0.5s;
     }
 
     .card .front,
@@ -72,16 +141,19 @@
       justify-content: center;
       font-size: 2rem;
       backface-visibility: hidden;
+      user-select: none;
     }
 
     .card .front {
-      background-color: #333;
+      background: linear-gradient(145deg, #444, #222);
       color: #ff5555;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
     }
 
     .card .back {
-      background-color: #1e1e1e;
+      background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
       transform: rotateY(180deg);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
     }
 
     .message {
@@ -89,6 +161,14 @@
       margin-bottom: 20px;
       color: #00ffae;
       text-align: center;
+      min-height: 30px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     button {
@@ -100,13 +180,107 @@
       border-radius: 5px;
       cursor: pointer;
       transition: 0.3s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     button:hover {
       background-color: #ff7777;
+      transform: translateY(-2px);
     }
 
-    @media (max-width: 400px) {
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background-color: #333;
+    }
+
+    button.secondary:hover {
+      background-color: #555;
+    }
+
+    .share-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .share-modal {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .share-modal h3 {
+      margin-bottom: 15px;
+      color: #ff5555;
+    }
+
+    .share-url {
+      background: #333;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 15px 0;
+      word-break: break-all;
+      font-family: monospace;
+      cursor: pointer;
+      border: 1px solid #555;
+      transition: all 0.3s;
+    }
+
+    .share-url:hover {
+      background: #444;
+      border-color: #ff5555;
+    }
+
+    .share-url.copied {
+      background: #2a5c2a;
+      border-color: #00ffae;
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    @media (max-width: 650px) {
+      .grid.hard {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 400px;
+      }
+    }
+
+    @media (max-width: 500px) {
       h1 {
         font-size: 1.5rem;
       }
@@ -114,26 +288,80 @@
       .card .front, .card .back {
         font-size: 1.5rem;
       }
+
+      .game-info {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .share-buttons {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .grid.easy,
+      .grid.medium {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
   </style>
 </head>
 <body>
   <h1>🧟 Jogo da Memória: Zumbis</h1>
 
-  <div class="stats">
-    Jogadas: <span id="moves">0</span> |
-    Pares: <span id="matches">0</span> |
-    Tempo: <span id="timer">0</span> segundos
+  <div class="difficulty">
+    <button id="easy" class="active">Fácil (4x4)</button>
+    <button id="medium">Médio (4x4)</button>
+    <button id="hard">Difícil (6x6)</button>
   </div>
 
-  <div class="grid" id="gameBoard"></div>
+  <div class="game-info">
+    <div class="stats">
+      Jogadas: <span id="moves">0</span>
+    </div>
+    <div class="stats">
+      Pares: <span id="matches">0</span>/<span id="totalPairs">8</span>
+    </div>
+    <div class="stats">
+      Tempo: <span id="timer">0</span>s
+    </div>
+    <div class="stats">
+      Pontuação: <span id="score">0</span>
+    </div>
+  </div>
 
-  <div class="message" id="message"></div>
+  <div class="grid easy" id="gameBoard"></div>
 
-  <button onclick="restartGame()">🔄 Jogar Novamente</button>
+  <div class="message" id="message">Encontre todos os pares para sobreviver!</div>
+
+  <div class="controls">
+    <button onclick="restartGame()">🔄 Jogar Novamente</button>
+    <button id="hintButton" onclick="giveHint()">💡 Dica (3)</button>
+    <button id="shareButton" onclick="showShareModal()" class="secondary" style="display:none;">📤 Compartilhar Resultado</button>
+  </div>
+
+  <div class="share-overlay" id="shareOverlay">
+    <div class="share-modal">
+      <h3>🎉 Resultado do Jogo!</h3>
+      <p>Você completou o jogo em <strong id="shareTime">0</strong> segundos com <strong id="shareMoves">0</strong> jogadas!</p>
+      <p>Pontuação: <strong id="shareScore">0</strong></p>
+      <p>Dificuldade: <strong id="shareDifficulty">Fácil</strong></p>
+      
+      <div class="share-url" id="shareUrl" onclick="copyShareUrl()" title="Clique para copiar">
+        Clique aqui para copiar o link
+      </div>
+      
+      <div class="share-buttons">
+        <button onclick="copyShareUrl()">📋 Copiar Link</button>
+        <button onclick="shareToSocial()">📱 Compartilhar</button>
+        <button onclick="closeShareModal()" class="secondary">Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const emojis = ['🧟', '🧠', '🔫', '🪓', '🩸', '☣️', '🏚️', '⚰️'];
+    const emojis = ['🧟', '🧠', '🔫', '🪓', '🩸', '☣️', '🏚️', '⚰️', '💀', '🦴', '🔪', '🧪', '🧫', '🔦', '🚨', '🚑', '🛡️', '⚔️', '🏥', '🔬', '🧨', '💉', '🩹', '🚪'];
     let cards = [];
     let firstCard = null;
     let secondCard = null;
@@ -143,15 +371,99 @@
     let time = 0;
     let timerStarted = false;
     let interval;
+    let score = 0;
+    let hints = 3;
+    let currentDifficulty = 'easy';
+    let totalPairs = 8;
+    let gameCompleted = false;
 
     const board = document.getElementById('gameBoard');
     const movesEl = document.getElementById('moves');
     const matchesEl = document.getElementById('matches');
     const messageEl = document.getElementById('message');
     const timerEl = document.getElementById('timer');
+    const scoreEl = document.getElementById('score');
+    const totalPairsEl = document.getElementById('totalPairs');
+    const hintButton = document.getElementById('hintButton');
+    const shareButton = document.getElementById('shareButton');
+    const shareOverlay = document.getElementById('shareOverlay');
+    const shareTime = document.getElementById('shareTime');
+    const shareMoves = document.getElementById('shareMoves');
+    const shareScore = document.getElementById('shareScore');
+    const shareDifficulty = document.getElementById('shareDifficulty');
+    const shareUrl = document.getElementById('shareUrl');
+
+    // Sons (usando Web Audio API)
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(frequency, duration, type = 'sine') {
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playMatchSound() {
+      playSound(523.25, 0.3); // Dó
+      playSound(659.25, 0.3); // Mi
+    }
+
+    function playMismatchSound() {
+      playSound(220, 0.5, 'sawtooth');
+    }
+
+    function playWinSound() {
+      playSound(523.25, 0.2);
+      setTimeout(() => playSound(659.25, 0.2), 200);
+      setTimeout(() => playSound(783.99, 0.2), 400);
+      setTimeout(() => playSound(1046.5, 0.5), 600);
+    }
 
     function shuffle(array) {
       return array.sort(() => 0.5 - Math.random());
+    }
+
+    function setDifficulty(level) {
+      currentDifficulty = level;
+      
+      // Atualizar botões de dificuldade
+      document.querySelectorAll('.difficulty button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(level).classList.add('active');
+      
+      // Definir tamanho do grid e número de pares
+      switch(level) {
+        case 'easy':
+          board.className = 'grid easy';
+          totalPairs = 8;
+          break;
+        case 'medium':
+          board.className = 'grid medium';
+          totalPairs = 8;
+          break;
+        case 'hard':
+          board.className = 'grid hard';
+          totalPairs = 12;
+          break;
+      }
+      
+      totalPairsEl.textContent = totalPairs;
+      restartGame();
     }
 
     function createCard(emoji, index) {
@@ -170,7 +482,7 @@
     }
 
     function flipCard(card) {
-      if (lock || card.classList.contains('matched') || card === firstCard) return;
+      if (lock || card.classList.contains('matched') || card === firstCard || gameCompleted) return;
 
       if (!timerStarted) {
         startTimer();
@@ -198,17 +510,44 @@
         secondCard.classList.add('matched');
         matches++;
         matchesEl.textContent = matches;
+        
+        // Atualizar pontuação
+        score += 100 - Math.floor(time / 10);
+        if (score < 0) score = 0;
+        scoreEl.textContent = score;
+        
+        playMatchSound();
 
-        if (matches === emojis.length) {
+        if (matches === totalPairs) {
+          gameCompleted = true;
           clearInterval(interval);
-          messageEl.textContent = `🎉 Vitória! Você sobreviveu em ${time} segundos com ${moves} jogadas!`;
+          // Bônus por terminar rápido
+          score += Math.max(0, 500 - time * 5);
+          scoreEl.textContent = score;
+          playWinSound();
+          messageEl.textContent = `🎉 Vitória! Você sobreviveu em ${time} segundos com ${moves} jogadas! Pontuação: ${score}`;
+          
+          // Mostrar botão de compartilhar
+          shareButton.style.display = 'block';
+          shareButton.style.animation = 'pulse 0.5s';
         }
 
         resetTurn();
       } else {
+        // Penalidade por erro
+        score -= 10;
+        if (score < 0) score = 0;
+        scoreEl.textContent = score;
+        
+        playMismatchSound();
+        
+        // Efeito visual de erro
+        firstCard.classList.add('shake');
+        secondCard.classList.add('shake');
+        
         setTimeout(() => {
-          firstCard.classList.remove('flip');
-          secondCard.classList.remove('flip');
+          firstCard.classList.remove('flip', 'shake');
+          secondCard.classList.remove('flip', 'shake');
           resetTurn();
         }, 1000);
       }
@@ -223,11 +562,192 @@
       interval = setInterval(() => {
         time++;
         timerEl.textContent = time;
+        
+        // Reduzir pontuação ao longo do tempo
+        if (time % 10 === 0 && score > 0) {
+          score -= 5;
+          if (score < 0) score = 0;
+          scoreEl.textContent = score;
+        }
       }, 1000);
     }
 
+    function giveHint() {
+      if (hints <= 0 || lock || gameCompleted) return;
+      
+      // Encontrar cartas não viradas e não combinadas
+      const unflippedCards = Array.from(document.querySelectorAll('.card:not(.flip):not(.matched)'));
+      
+      if (unflippedCards.length < 2) return;
+      
+      // Encontrar um par para dar dica
+      const emojiCount = {};
+      let hintPair = [];
+      
+      for (const card of unflippedCards) {
+        const emoji = card.dataset.emoji;
+        if (emojiCount[emoji]) {
+          hintPair = [emojiCount[emoji], card];
+          break;
+        } else {
+          emojiCount[emoji] = card;
+        }
+      }
+      
+      if (hintPair.length === 2) {
+        // Piscar as cartas da dica
+        hintPair[0].style.boxShadow = '0 0 15px yellow';
+        hintPair[1].style.boxShadow = '0 0 15px yellow';
+        
+        setTimeout(() => {
+          hintPair[0].style.boxShadow = '';
+          hintPair[1].style.boxShadow = '';
+        }, 1000);
+        
+        hints--;
+        hintButton.textContent = `💡 Dica (${hints})`;
+        
+        if (hints === 0) {
+          hintButton.disabled = true;
+          hintButton.style.opacity = '0.5';
+        }
+      }
+    }
+
+    function generateShareUrl() {
+      const gameData = {
+        difficulty: currentDifficulty,
+        time: time,
+        moves: moves,
+        score: score,
+        date: new Date().toISOString().split('T')[0]
+      };
+      
+      // Codificar os dados em base64 para o URL
+      const encodedData = btoa(JSON.stringify(gameData));
+      
+      // ✅ LINK DO SEU SITE
+      return `https://bielcrod.github.io/jogo-zumbi/?game=${encodedData}`;
+    }
+
+    function showShareModal() {
+      shareTime.textContent = time;
+      shareMoves.textContent = moves;
+      shareScore.textContent = score;
+      
+      // Traduzir dificuldade
+      const difficultyNames = {
+        'easy': 'Fácil',
+        'medium': 'Médio', 
+        'hard': 'Difícil'
+      };
+      shareDifficulty.textContent = difficultyNames[currentDifficulty];
+      
+      const url = generateShareUrl();
+      shareUrl.textContent = url;
+      shareUrl.classList.remove('copied');
+      
+      shareOverlay.style.display = 'flex';
+    }
+
+    function closeShareModal() {
+      shareOverlay.style.display = 'none';
+    }
+
+    function copyShareUrl() {
+      const url = generateShareUrl();
+      navigator.clipboard.writeText(url).then(() => {
+        // Feedback visual de cópia
+        shareUrl.classList.add('copied');
+        shareUrl.textContent = '✓ Link copiado com sucesso!';
+        
+        setTimeout(() => {
+          shareUrl.textContent = url;
+          shareUrl.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        console.error('Erro ao copiar:', err);
+        // Fallback para método antigo
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        shareUrl.classList.add('copied');
+        shareUrl.textContent = '✓ Link copiado!';
+        
+        setTimeout(() => {
+          shareUrl.textContent = url;
+          shareUrl.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function shareToSocial() {
+      const url = generateShareUrl();
+      const difficultyNames = {
+        'easy': 'Fácil',
+        'medium': 'Médio',
+        'hard': 'Difícil'
+      };
+      
+      // ✅ TEXTO ATUALIZADO COM SEU LINK
+      const text = `🎮 Zerei o Jogo da Memória Zumbi no modo ${difficultyNames[currentDifficulty]}! 
+⏱️ ${time} segundos | 🎯 ${moves} jogadas | ⭐ ${score} pontos 
+Jogue também: ${url}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Jogo da Memória: Zumbis',
+          text: text,
+          url: url
+        }).catch(err => {
+          console.log('Compartilhamento cancelado:', err);
+        });
+      } else {
+        // Fallback para Twitter
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(twitterUrl, '_blank', 'width=600,height=400');
+      }
+    }
+
+    function loadSharedGame() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameData = urlParams.get('game');
+      
+      if (gameData) {
+        try {
+          const decodedData = JSON.parse(atob(gameData));
+          
+          // Preencher modal com dados compartilhados
+          shareTime.textContent = decodedData.time;
+          shareMoves.textContent = decodedData.moves;
+          shareScore.textContent = decodedData.score;
+          
+          const difficultyNames = {
+            'easy': 'Fácil',
+            'medium': 'Médio',
+            'hard': 'Difícil'
+          };
+          shareDifficulty.textContent = difficultyNames[decodedData.difficulty] || decodedData.difficulty;
+          
+          // Mostrar modal com resultado compartilhado
+          setTimeout(() => {
+            shareOverlay.style.display = 'flex';
+          }, 1000);
+        } catch (e) {
+          console.error('Erro ao carregar jogo compartilhado:', e);
+        }
+      }
+    }
+
     function initGame() {
-      cards = shuffle([...emojis, ...emojis]);
+      // Selecionar emojis baseado na dificuldade
+      const selectedEmojis = emojis.slice(0, totalPairs);
+      cards = shuffle([...selectedEmojis, ...selectedEmojis]);
+      
       board.innerHTML = '';
       cards.forEach((emoji, index) => {
         const card = createCard(emoji, index);
@@ -238,21 +758,41 @@
       moves = 0;
       matches = 0;
       time = 0;
+      score = 0;
+      hints = 3;
+      gameCompleted = false;
       timerStarted = false;
       clearInterval(interval);
       movesEl.textContent = moves;
       matchesEl.textContent = matches;
       timerEl.textContent = time;
-      messageEl.textContent = '';
+      scoreEl.textContent = score;
+      messageEl.textContent = 'Encontre todos os pares para sobreviver!';
+      hintButton.textContent = `💡 Dica (${hints})`;
+      hintButton.disabled = false;
+      hintButton.style.opacity = '1';
+      shareButton.style.display = 'none';
     }
 
     function restartGame() {
       initGame();
     }
 
+    // Configurar botões de dificuldade
+    document.getElementById('easy').addEventListener('click', () => setDifficulty('easy'));
+    document.getElementById('medium').addEventListener('click', () => setDifficulty('medium'));
+    document.getElementById('hard').addEventListener('click', () => setDifficulty('hard'));
+
+    // Fechar modal ao clicar fora
+    shareOverlay.addEventListener('click', (e) => {
+      if (e.target === shareOverlay) {
+        closeShareModal();
+      }
+    });
+
     // Inicia ao carregar
     initGame();
+    loadSharedGame();
   </script>
 </body>
 </html>
-
